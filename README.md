@@ -1,5 +1,5 @@
 ## collider IM信令服务配置
-注意: 第三条有一个配置IP的地方,另外有需要翻墙有地方
+注意: 第三条有一个配置IP的地方,另外有需要翻墙的地方
 ### 1.请先安装golang,以Ubuntu为例
 ```bash
 $ sudo apt-get update
