@@ -24,4 +24,4 @@ $ go get golang.org/x/net/websocket
 $ go install collidermain
 $ collidermain -room-server=http://IP:6060
 ```
-<a href="https://github.com/changvvb/IM">BACK</a> 
+<a href="https://github.com/changvvb/IM#1配置collider信令服务器基于golang">BACK</a> 
