@@ -17,7 +17,7 @@ $ mkdir -p ~/go/bin ~/go/src ~/go/pkg
 ### 3.配置和部署
 ```bash
 $ cd ~/go/src
-$ git clone git@github.com:changvvb/collidersrc.git
+$ git clone https://github.com/changvvb/collidersrc.git
 $ mv collidersrc/collider* ./
 $ go get github.com/go-sql-driver/mysql
 $ go get golang.org/x/net/websocket
