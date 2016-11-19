@@ -48,6 +48,7 @@ func (c *Collider) Run(p int, useTls bool) {
 	http.Handle("/ws", websocket.Handler(c.wsHandler))
 	http.HandleFunc("/status", c.httpStatusHandler)
 	http.HandleFunc("/", c.httpHandler)
+	http.HandleFunc("/deregister", c.httpDeregister)
 
 	var e error
 
@@ -92,6 +93,18 @@ func (c *Collider) httpStatusHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		c.dash.onHttpErr(err)
 	}
+}
+
+func (c *Collider) httpDeregister(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+	p := strings.Split(r.URL.Path, "/")
+	if len(p) != 2 {
+		c.httpError("Invalid path: "+r.URL.Path, w)
+		return
+	}
+	rid := p[1]
+	c.roomTable.removeRoom(rid)
+	io.WriteString(w, "OK\n")
 }
 
 // httpHandler is a HTTP handler that handles GET/POST/DELETE requests.
@@ -204,6 +217,7 @@ loop:
 			}
 			if err = c.roomTable.register(msg.RoomID, msg.ClientID, ws); err != nil {
 				c.wsError(err.Error(), ws)
+				log.Println("Register Error", err)
 				break loop
 			}
 			registered, rid, cid = true, msg.RoomID, msg.ClientID
