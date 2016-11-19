@@ -129,6 +129,7 @@ func (c *Collider) httpHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		c.httpReturnSuccess(w)
 	case "DELETE":
+		log.Println(r.URL.Path)
 		if cid == "ALL" {
 			log.Printf("DELETE ALL METHOD!")
 			c.roomTable.removeRoom(rid)
