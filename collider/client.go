@@ -138,6 +138,7 @@ func (c *client) sendByID(OtherClientID string, cmd string, msg string) error {
 			return send(other.rwc, m)
 		}
 	} else {
+		log.Println("The reveiver is offline now")
 		//这里因为数据库还没建好，先注释了
 		/*
 			db, err := sql.Open("mysql", MYSQL_CONNECT_STRING)
