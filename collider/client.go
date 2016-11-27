@@ -67,7 +67,7 @@ func (c *client) register(rwc io.ReadWriteCloser) error {
 	c.state = ONLINE
 	c.getContactState()
 	c.informState()
-	//	c.getOfflineMessage()
+	c.getOfflineMessage()
 
 	return nil
 }
@@ -138,29 +138,30 @@ func (c *client) sendByID(OtherClientID string, cmd string, msg string) error {
 			return send(other.rwc, m)
 		}
 	} else {
-		log.Println("The reveiver is offline now")
-		//这里因为数据库还没建好，先注释了
-		/*
-			db, err := sql.Open("mysql", MYSQL_CONNECT_STRING)
-			if err != nil {
-				return err
-			}
+		log.Println("The receiver is offline now")
 
-				stmt, err := db.Prepare("INSERT offlineMessage SET id=?, cmd=?, origin=?, message=?, time=?")
-				if err != nil {
-					return err
-				}
-				res, err := stmt.Exec(OtherClientID, cmd, c.id, msg, time.Now())
-				if err != nil {
-					return nil
-				}
-				affect, err := res.RowsAffected()
-				if err != nil {
-					return err
-				}
-				if affect != 0 {
-					log.Printf("insert offlineMessage successfully")
-				}*/
+		db, err := sql.Open("mysql", MYSQL_CONNECT_STRING)
+		if err != nil {
+			return err
+		}
+
+		stmt, err := db.Prepare("INSERT INTO offlineMessage(cmd,fromid,toid,msg,created) VALUES (?,?,?,?,?)")
+		if err != nil {
+			return err
+		}
+		res, err := stmt.Exec(cmd, c.id, OtherClientID, msg, time.Now())
+		if err != nil {
+			log.Println("Error,exec", err)
+			return nil
+		}
+		affect, err := res.RowsAffected()
+		if err != nil {
+			log.Println("Affect,exec")
+			return err
+		}
+		if affect != 0 {
+			log.Printf("insert offlineMessage successfully")
+		}
 	}
 	return nil
 }
@@ -203,30 +204,33 @@ func (c *client) getOneStateByID(ClientID string) (string, *client) {
 	}
 }
 
-const MYSQL_CONNECT_STRING = "turn:turn@tcp(localhost:3306)/collider"
+const MYSQL_CONNECT_STRING = "root:root@tcp(localhost:3306)/im?parseTime=true"
 
 func (c *client) getOfflineMessage() {
 	db, err := sql.Open("mysql", MYSQL_CONNECT_STRING)
 	checkErr(err)
 
-	rows, err := db.Query("SELECT * FROM offlineMessage WHERE id=" + c.id)
+	rows, err := db.Query("SELECT * FROM offlineMessage WHERE toid=" + c.id)
 	checkErr(err)
 	for rows.Next() {
 		var cmd string
 		var origin string
 		var message string
-		var id string
-		var msg_time string
-		err = rows.Scan(&id, &cmd, &origin, &message, &msg_time)
+		var to string
+		var msgTime time.Time
+		var id int
+		err = rows.Scan(&id, &cmd, &to, &origin, &msgTime, &message)
 		checkErr(err)
 		m := wsServerMsg{
 			From: origin,
-			Msg:  message + " " + msg_time,
-			Cmd:  "offline_message",
+			Msg:  message,
+			Cmd:  "offlinemessage",
+			Time: msgTime.Local(),
 		}
+		log.Printf("%+v\n", m)
 		send(c.rwc, m)
 	}
-	stmt, err := db.Prepare("DELETE FROM offlineMessage WHERE id=?")
+	stmt, err := db.Prepare("DELETE FROM offlineMessage WHERE toid=?")
 	checkErr(err)
 	_, err = stmt.Exec(c.id)
 	checkErr(err)

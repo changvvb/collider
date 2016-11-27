@@ -181,7 +181,7 @@ func (c *Collider) httpReturnSuccess(w http.ResponseWriter) {
 // Unexpected messages will cause the WebSocket connection to be closed.
 func (c *Collider) wsHandler(ws *websocket.Conn) {
 	var rid, cid string
-	var this_client *client
+	var thisClient *client
 	registered := false
 
 	var msg wsClientMsg
@@ -221,13 +221,16 @@ loop:
 				break loop
 			}
 			registered, rid, cid = true, msg.RoomID, msg.ClientID
-			this_client = registered_clients[cid]
+			thisClient = registered_clients[cid]
 			c.dash.incrWs()
 
 			defer c.roomTable.deregister(rid, cid)
 			break
 		case "send":
-			fmt.Println("cmd == send")
+			fmt.Println("Cmd == send")
+			if thisClient == nil {
+				continue
+			}
 			fmt.Println(msg.Msg)
 			if !registered {
 				c.wsError("Client not registered", ws)
@@ -240,10 +243,13 @@ loop:
 			c.roomTable.send(rid, cid, "send", msg.Msg)
 			break
 		case "video_chat":
-			log.Printf("cmd == video_chat")
+			if thisClient == nil {
+				continue
+			}
+			log.Printf("Cmd == video_chat")
 			log.Printf("clientID == %s, Msg == %s, Destinatio == %s", msg.ClientID, msg.Msg, msg.To)
 			if msg.Msg != "" && msg.To != "" {
-				if err := this_client.sendByID(msg.To, "video_chat", msg.Msg); err == nil {
+				if err := thisClient.sendByID(msg.To, "video_chat", msg.Msg); err == nil {
 					log.Printf("%s want vodeo_chat to %s: %s", cid, msg.To, msg.Msg)
 				} else {
 					log.Printf(err.Error())
@@ -252,10 +258,13 @@ loop:
 			}
 
 		case "audio_chat":
+			if thisClient == nil {
+				continue
+			}
 			log.Printf("cmd == audio_chat")
 			log.Printf("clientID == %s, Msg == %s, Destinatio == %s", msg.ClientID, msg.Msg, msg.To)
 			if msg.Msg != "" && msg.To != "" {
-				if err := this_client.sendByID(msg.To, "audio_chat", msg.Msg); err == nil {
+				if err := thisClient.sendByID(msg.To, "audio_chat", msg.Msg); err == nil {
 					log.Printf("%s want audio_chat to %s: %s", cid, msg.To, msg.Msg)
 				} else {
 					log.Printf(err.Error())
@@ -264,9 +273,13 @@ loop:
 			}
 
 		case "chat":
-			fmt.Println("cmd == chat")
+			if thisClient == nil {
+				continue
+			}
+			fmt.Println("cmd == chat:")
+			fmt.Printf("%+v\n", msg)
 			if msg.Msg != "" && msg.To != "" {
-				if err := this_client.sendByID(msg.To, "chat", msg.Msg); err == nil {
+				if err := thisClient.sendByID(msg.To, "chat", msg.Msg); err == nil {
 					log.Printf("%s want chat to %s: %s", cid, msg.To, msg.Msg)
 				} else {
 					log.Printf(err.Error())

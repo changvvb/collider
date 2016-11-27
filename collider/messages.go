@@ -8,6 +8,7 @@ package collider
 import (
 	"encoding/json"
 	"io"
+	"time"
 )
 
 // WebSocket message from the client.
@@ -21,10 +22,11 @@ type wsClientMsg struct {
 
 // wsServerMsg is a message sent to a client on behalf of another client.
 type wsServerMsg struct {
-	Cmd   string `json:"cmd"`
-	From  string `json:"from"`
-	Msg   string `json:"msg"`
-	Error string `json:"error"`
+	Cmd   string    `json:"cmd"`
+	From  string    `json:"from"`
+	Msg   string    `json:"msg"`
+	Error string    `json:"error"`
+	Time  time.Time `json:"time"`
 }
 
 // sendServerMsg sends a wsServerMsg composed from |msg| to the connection.
