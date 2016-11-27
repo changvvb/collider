@@ -134,6 +134,7 @@ func (c *client) sendByID(OtherClientID string, cmd string, msg string) error {
 				Msg:  msg,
 				Cmd:  cmd,
 				From: c.id,
+				Time: time.Now().Local(),
 			}
 			return send(other.rwc, m)
 		}
