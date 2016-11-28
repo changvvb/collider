@@ -203,7 +203,7 @@ loop:
 			break
 		}
 
-		log.Println("%+v", msg)
+		log.Printf("%+v\n", msg)
 
 		switch msg.Cmd {
 		case "register":

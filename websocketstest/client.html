@@ -43,8 +43,9 @@
 var myID = "";
 myid = $("#id").val();
 
-
-var exampleSocket = new WebSocket("ws://115.29.55.106:6067/ws");
+//var server = "ws://115.29.55.106:6067/ws";
+var server = "ws://127.0.0.1:6067/ws";
+var exampleSocket = new WebSocket(server);
 exampleSocket.onopen = function (event) {}
 //var exampleSocket = new WebSocket("ws://127.0.0.1:6067/ws");
 
@@ -53,7 +54,7 @@ connect = document.getElementById("connect");
 
 connect.onclick = function f() {
     exampleSocket.close();
-    exampleSocket = new WebSocket("ws://115.29.55.106:6067/ws");
+    exampleSocket = new WebSocket(server);
     exampleSocket.onopen = function (event) {
         myid = $("#id").val();
         toid = $("#toid").val();
