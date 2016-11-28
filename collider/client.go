@@ -211,7 +211,7 @@ func (c *client) getOfflineMessage() {
 	db, err := sql.Open("mysql", MYSQL_CONNECT_STRING)
 	checkErr(err)
 
-	rows, err := db.Query("SELECT * FROM offlineMessage WHERE toid=" + c.id)
+	rows, err := db.Query("SELECT * FROM offlineMessage WHERE toid=" + "'" + c.id + "'")
 	checkErr(err)
 	for rows.Next() {
 		var cmd string

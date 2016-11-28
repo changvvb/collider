@@ -35,7 +35,8 @@ var myID = "";
 
 
 
-var exampleSocket = new WebSocket("ws://115.29.55.106:6067/ws");
+//var exampleSocket = new WebSocket("ws://115.29.55.106:6067/ws");
+var exampleSocket = new WebSocket("ws://127.0.0.1:6067/ws");
 exampleSocket.onopen = function (event) {
 }
 
@@ -51,8 +52,8 @@ client1_button.onclick = function f() {
     var msg = {
     Cmd:          "register",
     RoomId:       "333",
-    ClientId:     "001",
-    To:"002",
+    ClientId:     "001HAHA",
+    To:"002HAHA",
     Msg:""
 }
    myID = "001";
@@ -66,11 +67,11 @@ client2_button.onclick = function() {
     var msg = {
        Cmd:"register",
        RoomId:"333",
-       ClientId:"002",
+       ClientId:"002HAHA",
        Msg:"register"
    };
-   myID = "002";
-   document.getElementById("client_id").innerHTML = "002";
+   myID = "002HAHA";
+   document.getElementById("client_id").innerHTML = "002HAHA";
    json_msg =  JSON.stringify(msg);
    exampleSocket.send(json_msg);
 }
@@ -83,10 +84,10 @@ send_button.onclick = function() {
     Msg:""
   }
   msg.ClientID = myID;
-  if (msg.ClientID == "001") {
-      msg.To = "002";
+  if (msg.ClientID == "001HAHA") {
+      msg.To = "002HAHA";
   } else 
-      msg.To = "001";
+      msg.To = "001HAHA";
   var send_box = document.getElementById("send");
   var send_str = send_box.value;
   send_box.text = "";
