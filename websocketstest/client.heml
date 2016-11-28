@@ -1,0 +1,91 @@
+<!--
+<body style="background-color:brown;">
+
+<button class="btn" id="client1_button" type="button" style="width:200px;height:100px;">
+   I am client1
+</button>
+
+<button class="btn" id="client2_button" type="button" style="width:200px;height:100px;">
+    I am client2
+</button>
+
+<input id="send" height=40>
+</input>
+
+<button id="send_button" type="button" style="width:100px;height:50px;">SEND</button>
+<textarea id="recieve" rows="20" cols="150">
+</textarea>
+
+<p id="client_id"></p>
+
+<script>
+
+
+var myID = "";
+
+
+
+var exampleSocket = new WebSocket("ws://115.29.55.106:6067/ws");
+//var exampleSocket = new WebSocket("ws://127.0.0.1:6067/ws");
+exampleSocket.onopen = function (event) {
+}
+
+exampleSocket.onmessage = function (event) {
+  recieve_text = document.getElementById("recieve");
+  var text = recieve_text.innerHTML;
+  recieve_text.innerHTML = text + event.data;
+  console.log(event.data);
+};
+
+client1_button = document.getElementById("client1_button");
+client1_button.onclick = function f() {
+    var msg = {
+    Cmd:          "register",
+    RoomId:       "333",
+    ClientId:     "001HAHA",
+    To:"002HAHA",
+    Msg:""
+}
+   myID = "001";
+   document.getElementById("client_id").innerHTML="001";
+   json_msg =  JSON.stringify(msg);
+   exampleSocket.send(json_msg);
+};
+
+client2_button = document.getElementById("client2_button");
+client2_button.onclick = function() {
+    var msg = {
+       Cmd:"register",
+       RoomId:"333",
+       ClientId:"002HAHA",
+       Msg:"register"
+   };
+   myID = "002HAHA";
+   document.getElementById("client_id").innerHTML = "002HAHA";
+   json_msg =  JSON.stringify(msg);
+   exampleSocket.send(json_msg);
+}
+
+send_button = document.getElementById("send_button");
+send_button.onclick = function() {
+  var msg = {
+    Cmd:"chat",
+    RoomId:"333",
+    Msg:""
+  }
+  msg.ClientID = myID;
+  if (msg.ClientID == "001HAHA") {
+      msg.To = "002HAHA";
+  } else
+      msg.To = "001HAHA";
+  var send_box = document.getElementById("send");
+  var send_str = send_box.value;
+  send_box.text = "";
+  msg.Msg = send_str;
+  json_msg = JSON.stringify(msg)
+  exampleSocket.send(json_msg);
+}
+</script>
+
+</body>
+</html>

@@ -61,6 +61,7 @@ func (rm *room) register(clientID string, rwc io.ReadWriteCloser) error {
 	//if _, ok := rm.clients[clientID]; ok {
 	//	return errors.New("someone has registered using this " + clientID + " ID")
 	//}
+	rm.remove(clientID)
 	c, err := rm.client(clientID)
 	if err != nil {
 		return err

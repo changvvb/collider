@@ -1,0 +1,130 @@
+<html>
+<head>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+<form >
+        <label for="id">ID:</label>
+        <div class="input-group">
+            <input id="id" type="text" class="form-control" placeholder="请输入ID">
+            <span class="input-group-btn">
+                <button id="connect" class="btn btn-default" type="button">确认</button>
+            </span>
+            <span class="input-group-btn">
+                <button id="disconnect" class="btn btn-default" type="button">断开</button>
+            </span>
+        </div>
+        <div class="input-group">
+            <label for="toid">ToID:</label>
+            <input id="toid" type="toid" class="form-control" placeholder="请输入对方ID">
+        </div>
+        <label for="message">Message:</label>
+        <div class="input-group">
+            <input  id="message" ype="text" class="form-control" placeholder="Message">
+            <span class="input-group-btn">
+                <button id="send" class="btn btn-default" type="button">发送</button>
+            </span>
+        </div>
+        <label for="receive">接收:</label>
+        <textarea id="receive" class="form-control" rows="20" cols="auto"></textarea>
+    </form>
+    </div>
+</div>
+
+<script>
+
+
+var myID = "";
+myid = $("#id").val();
+
+
+var exampleSocket = new WebSocket("ws://115.29.55.106:6067/ws");
+exampleSocket.onopen = function (event) {}
+//var exampleSocket = new WebSocket("ws://127.0.0.1:6067/ws");
+
+
+connect = document.getElementById("connect");
+
+connect.onclick = function f() {
+    exampleSocket.close();
+    exampleSocket = new WebSocket("ws://115.29.55.106:6067/ws");
+    exampleSocket.onopen = function (event) {
+        myid = $("#id").val();
+        toid = $("#toid").val();
+        var msg = {
+        Cmd:          "register",
+        RoomId:       myid+"room",
+        ClientId:    myid,
+        To:toid,
+        Msg:""
+        }
+
+       json_msg =  JSON.stringify(msg);
+       exampleSocket.send(json_msg);
+   }
+
+
+   exampleSocket.onmessage = function (event) {
+     recieve_text = document.getElementById("receive");
+     var text = recieve_text.innerHTML;
+     recieve_text.innerHTML = text + event.data;
+     console.log(event.data);
+   };
+};
+
+/*
+client2_button = document.getElementById("client2_button");
+client2_button.onclick = function() {
+    var msg = {
+       Cmd:"register",
+       RoomId:"333",
+       ClientId:"002HAHA",
+       Msg:"register"
+   };
+   myID = "002HAHA";
+   document.getElementById("client_id").innerHTML = "002HAHA";
+   json_msg =  JSON.stringify(msg);
+   exampleSocket.send(json_msg);
+}
+*/
+
+
+
+send = document.getElementById("send");
+send.onclick = function() {
+    toid = $("#toid").val();
+    myid = $("#id").val();
+  var msg = {
+    Cmd:"chat",
+    RoomId:"333",
+    Msg:"",
+    ClientId:myid,
+    To:toid
+  }
+  // msg.ClientID = myID;
+  // if (msg.ClientID == "001HAHA") {
+  //     msg.To = "002HAHA";
+  // } else
+  //     msg.To = "001HAHA";
+  var send_box = document.getElementById("send");
+  var send_str = $("#message").val();
+  msg.Msg = send_str;
+  json_msg = JSON.stringify(msg)
+  exampleSocket.send(json_msg);
+}
+
+disconnect = document.getElementById("disconnect");
+disconnect.onclick = function() {
+    exampleSocket.close();
+}
+
+</script>
+
+</body>
+</html>
