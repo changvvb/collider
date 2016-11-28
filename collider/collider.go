@@ -203,6 +203,8 @@ loop:
 			break
 		}
 
+		log.Println("%+v", msg)
+
 		switch msg.Cmd {
 		case "register":
 			fmt.Println("cmd == register")
@@ -277,7 +279,6 @@ loop:
 				continue
 			}
 			fmt.Println("cmd == chat:")
-			fmt.Printf("%+v\n", msg)
 			if msg.Msg != "" && msg.To != "" {
 				if err := thisClient.sendByID(msg.To, "chat", msg.Msg); err == nil {
 					log.Printf("%s want chat to %s: %s", cid, msg.To, msg.Msg)
