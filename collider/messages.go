@@ -31,11 +31,25 @@ type wsClientMsg struct {
 
 // wsServerMsg is a message sent to a client on behalf of another client.
 type wsServerMsg struct {
-	Cmd   string   `json:"cmd"`
-	From  string   `json:"from"`
-	Msg   string   `json:"msg"`
-	Error string   `json:"error"`
-	Time  JSONTime `json:"time"`
+	Cmd   string    `json:"cmd"`
+	From  string    `json:"from"`
+	Msg   string    `json:"msg"`
+	Error string    `json:"error"`
+	Time  time.Time `json:"time"`
+	Read  bool      `json:"read"`
+}
+
+func (m wsServerMsg) MarshalJSON() ([]byte, error) {
+	var TimeFormat = "2006-01-02 15:04:05"
+
+	type Alias wsServerMsg
+	return json.Marshal(&struct {
+		*Alias
+		Time string `json:"time"`
+	}{
+		Alias: (*Alias)(&m),
+		Time:  m.Time.Format(TimeFormat),
+	})
 }
 
 // sendServerMsg sends a wsServerMsg composed from |msg| to the connection.
