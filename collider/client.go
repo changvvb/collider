@@ -139,7 +139,7 @@ func (c *client) saveMessage(m *wsServerMsg, toid string) error {
 		return err
 	}
 
-	log.Println("changvvb", m.Time)
+	log.Printf("%+v\n", m)
 	res, err := stmt.Exec(m.Cmd, toid, m.From, m.Time, m.Msg, m.Read)
 	if err != nil {
 		log.Println("Error,exec", err)
@@ -267,7 +267,7 @@ func (c *client) getMessage() {
 		m := wsServerMsg{
 			From: origin,
 			Msg:  message,
-			Cmd:  "message",
+			Cmd:  cmd,
 			Time: msgTime.Local(),
 			Read: read,
 		}
