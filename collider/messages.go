@@ -7,9 +7,18 @@ package collider
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 )
+
+type JSONTime time.Time
+
+func (t JSONTime) MarshalJSON() ([]byte, error) {
+	var TimeFormat = "2006-01-02 15:04:05"
+	ts := fmt.Sprintf("\"%s\"", time.Time(t).Format(TimeFormat))
+	return []byte(ts), nil
+}
 
 // WebSocket message from the client.
 type wsClientMsg struct {
@@ -22,11 +31,11 @@ type wsClientMsg struct {
 
 // wsServerMsg is a message sent to a client on behalf of another client.
 type wsServerMsg struct {
-	Cmd   string    `json:"cmd"`
-	From  string    `json:"from"`
-	Msg   string    `json:"msg"`
-	Error string    `json:"error"`
-	Time  time.Time `json:"time"`
+	Cmd   string   `json:"cmd"`
+	From  string   `json:"from"`
+	Msg   string   `json:"msg"`
+	Error string   `json:"error"`
+	Time  JSONTime `json:"time"`
 }
 
 // sendServerMsg sends a wsServerMsg composed from |msg| to the connection.

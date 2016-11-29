@@ -37,7 +37,7 @@ type client struct {
 	state string
 }
 
-var registered_clients map[string]*client
+var registeredClients map[string]*client
 
 func newClient(id string, t *time.Timer) *client {
 	c := client{id: id, timer: t}
@@ -59,7 +59,7 @@ func (c *client) register(rwc io.ReadWriteCloser) error {
 		return errors.New("Duplicated registration")
 	}
 
-	registered_clients[c.id] = c
+	registeredClients[c.id] = c
 	c.setTimer(nil)
 	c.rwc = rwc
 
@@ -81,7 +81,7 @@ func (c *client) deregister() {
 		c.rwc.Close()
 		c.rwc = nil
 	}
-	delete(registered_clients, c.id)
+	delete(registeredClients, c.id)
 }
 
 // registered returns true if the client has registered.
@@ -127,14 +127,14 @@ func (c *client) send(other *client, cmd string, msg string) error {
 
 //通过ClientID发送信息
 func (c *client) sendByID(OtherClientID string, cmd string, msg string) error {
-	if other := registered_clients[OtherClientID]; other != nil {
+	if other := registeredClients[OtherClientID]; other != nil {
 		if other.rwc != nil {
 			log.Printf("sending %s to %s from %s, cmd is %s", msg, other.id, c.id, cmd)
 			m := wsServerMsg{
 				Msg:  msg,
 				Cmd:  cmd,
 				From: c.id,
-				Time: time.Now().Local(),
+				Time: JSONTime(time.Now().Local()),
 			}
 			return send(other.rwc, m)
 		}
@@ -174,7 +174,7 @@ func (c *client) informState() {
 		From: c.id,
 	}
 	for _, contact_ := range c.contact_.clientsID {
-		if client_ := registered_clients[contact_]; client_ != nil {
+		if client_ := registeredClients[contact_]; client_ != nil {
 			send(client_.rwc, m)
 		}
 	}
@@ -198,7 +198,7 @@ func (c *client) getContactState() {
 }
 
 func (c *client) getOneStateByID(ClientID string) (string, *client) {
-	if client_ := registered_clients[ClientID]; client_ != nil {
+	if client_ := registeredClients[ClientID]; client_ != nil {
 		return client_.state, client_
 	} else {
 		return "OFFLINE", nil
@@ -226,7 +226,7 @@ func (c *client) getOfflineMessage() {
 			From: origin,
 			Msg:  message,
 			Cmd:  "offlinemessage",
-			Time: msgTime.Local(),
+			Time: JSONTime(msgTime.Local()),
 		}
 		log.Printf("%+v\n", m)
 		send(c.rwc, m)

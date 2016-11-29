@@ -36,7 +36,7 @@ type Collider struct {
 }
 
 func NewCollider(rs string) *Collider {
-	registered_clients = make(map[string]*client)
+	registeredClients = make(map[string]*client)
 	return &Collider{
 		roomTable: newRoomTable(time.Second*registerTimeoutSec, rs),
 		dash:      newDashboard(),
@@ -150,7 +150,7 @@ func (c *Collider) httpHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			log.Printf("DELETE %s", cid)
 			//c.sendDeleteError(cid, "YOU_ARE_OFFLINE")
-			if c_ := registered_clients[cid]; c_ != nil {
+			if c_ := registeredClients[cid]; c_ != nil {
 				log.Printf("DELETE %s----------------------", cid)
 				sendServerErr(c_.rwc, "YOU_ARE_OFFLINE")
 			}
@@ -223,7 +223,7 @@ loop:
 				break loop
 			}
 			registered, rid, cid = true, msg.RoomID, msg.ClientID
-			thisClient = registered_clients[cid]
+			thisClient = registeredClients[cid]
 			c.dash.incrWs()
 
 			defer c.roomTable.deregister(rid, cid)
@@ -315,7 +315,7 @@ func (c *Collider) wsError(msg string, ws *websocket.Conn) {
 
 func (c *Collider) sendDeleteError(msg string, cid string) {
 	log.Printf("sendServerErr         --------")
-	if c_ := registered_clients[cid]; c_ != nil {
+	if c_ := registeredClients[cid]; c_ != nil {
 		log.Printf("DELETE %s----------------------", cid)
 		sendServerErr(c_.rwc, msg)
 	}
