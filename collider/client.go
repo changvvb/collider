@@ -256,7 +256,7 @@ func (c *client) getMessage() {
 	db, err := sql.Open("mysql", MYSQL_CONNECT_STRING)
 	checkErr(err)
 
-	rows, err := db.Query("SELECT * FROM message WHERE toid=" + "'" + c.id + "'")
+	rows, err := db.Query("SELECT * FROM message WHERE toid='" + c.id + "' OR fromid='" + c.id + "'")
 	checkErr(err)
 	for rows.Next() {
 		var cmd string
