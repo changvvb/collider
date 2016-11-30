@@ -168,7 +168,11 @@ func (c *client) sendByID(OtherClientID string, cmd string, msg string) error {
 		if other.rwc != nil {
 			log.Printf("Sending %s to %s from %s, cmd is %s", msg, other.id, c.id, cmd)
 			m.Read = true
-			return send(other.rwc, m)
+			err := send(other.rwc, m)
+			if err != nil {
+				log.Println(err)
+				return err
+			}
 		}
 	} else {
 		m.Read = false
