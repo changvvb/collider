@@ -287,6 +287,11 @@ loop:
 					sendServerErr(ws, err.Error())
 				}
 			}
+		case "history":
+			if thisClient == nil {
+				continue
+			}
+			thisClient.getMessage(msg.To)
 		case "leave":
 			fmt.Println(" ------------------>leave")
 			c.roomTable.deregister(rid, cid)

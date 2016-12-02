@@ -68,7 +68,7 @@ func (c *client) register(rwc io.ReadWriteCloser) error {
 	c.getContactState()
 	c.informState()
 	// c.getOfflineMessage()
-	c.getMessage()
+	// c.getMessage()
 
 	return nil
 }
@@ -252,11 +252,11 @@ func (c *client) getOfflineMessage() {
 	defer db.Close()
 }
 
-func (c *client) getMessage() {
+func (c *client) getMessage(toid string) {
 	db, err := sql.Open("mysql", MYSQL_CONNECT_STRING)
 	checkErr(err)
 
-	rows, err := db.Query("SELECT * FROM message WHERE toid='" + c.id + "' OR fromid='" + c.id + "'")
+	rows, err := db.Query("SELECT * FROM message WHERE (toid='" + c.id + "' AND fromid='" + toid + "') OR ( fromid='" + c.id + "' AND toid='" + toid + "')")
 	checkErr(err)
 	for rows.Next() {
 		var cmd string
